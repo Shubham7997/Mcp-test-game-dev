@@ -1,0 +1,266 @@
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #1d4ed8;
+  --background-color: #f3f4f6;
+  --text-color: #1f2937;
+  --border-color: #d1d5db;
+  --success-color: #059669;
+  --danger-color: #dc2626;
+  --warning-color: #d97706;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+.game-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin: 0;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.player-stats h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+}
+
+.attempts {
+  margin: 0;
+}
+
+.attempts span {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.turn-indicator h3 {
+  margin: 0;
+}
+
+.your-turn {
+  color: var(--success-color);
+}
+
+.waiting {
+  color: var(--warning-color);
+}
+
+.event-display {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.event-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1rem;
+}
+
+.event-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.event-content {
+  padding: 1rem;
+}
+
+.event-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.event-history {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.event-history h3 {
+  margin: 0 0 1rem 0;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.past-event {
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  background-color: var(--background-color);
+}
+
+.past-event h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-color);
+}
+
+.past-event p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.action-area {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.teammates-list h3 {
+  margin: 0 0 1rem 0;
+}
+
+.teammates-status {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.active-teammates h4,
+.inactive-teammates h4 {
+  margin: 0 0 0.75rem 0;
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.teammate-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.teammate-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.inactive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.inactive-teammate {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  text-align: center;
+}
+
+.skip-button {
+  width: 100%;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.skip-button:hover {
+  background-color: var(--border-color);
+}
+
+.game-over {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  text-align: center;
+}
+
+.game-over h2 {
+  color: var(--primary-color);
+  margin: 0 0 1rem 0;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.player-result {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.player-result.won {
+  background-color: rgba(5, 150, 105, 0.1);
+}
+
+.player-result.lost {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.player-result p {
+  margin: 0;
+}
+
+.player-result span {
+  font-weight: bold;
+}
+
+.player-result.won span {
+  color: var(--success-color);
+}
+
+.player-result.lost span {
+  color: var(--danger-color);
+}
