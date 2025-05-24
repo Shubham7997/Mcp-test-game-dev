@@ -50,6 +50,10 @@ function generateNPCs() : NPC[]{
         name : "unknown",
         pos : {x: j, y: i},
         dialogue : "hello",
+        redPassedByDirection: "",
+        bluePassedByDirection: "",
+        lastContactedRed: false, // last frame contact or not
+        lastContactedBlue: false,
         isRedPassed: false,
         isBluePassed : false,
         sayTruth: true,
@@ -180,8 +184,10 @@ Rune.initLogic({
       var r = ""
       game.npcs.forEach((npc) =>{
         if (npc.pos.x === newPos.x && npc.pos.y === newPos.y){
+          game.lastNpc = npc
           if (isRedPlayer){
             npc.isRedPassed = true
+            npc.lastContactedRed = true
             if (npc.isBluePassed){
               if (npc.sayTruth){
 
@@ -197,6 +203,7 @@ Rune.initLogic({
           } 
           if (isBluePlayer){
             npc.isBluePassed = true
+            npc.lastContactedBlue = true
             if (npc.isRedPassed){
               if (npc.sayTruth){
 
@@ -216,6 +223,22 @@ Rune.initLogic({
         }
       }
     )
+
+    if (game.lastNpc.lastContactedRed && isRedPlayer){
+      if (newPos.x > game.lastNpc.pos.x){
+        game.lastNpc.redPassedByDirection = "right"
+      }
+      else if (newPos.x < game.lastNpc.pos.x){
+        game.lastNpc.redPassedByDirection = "left"
+      }
+      else if (newPos.y > game.lastNpc.pos.y){
+        game.lastNpc.redPassedByDirection = "down"
+      }
+      else if (newPos.y < game.lastNpc.pos.y){
+        game.lastNpc.redPassedByDirection = "up"
+      }
+      lastNpc.lastContactedRed = false
+    }
 
       // Check win conditions
       if (isCaught(game.redBall, game.blueBall)) {

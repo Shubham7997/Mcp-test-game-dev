@@ -11,6 +11,7 @@ export interface GameState {
   blueBall: Position
   maze: boolean[][],
   npcs: NPC[],
+  lastNpc: NPC,
   intelInfo: string,
   gameOver: boolean
   winner: PlayerId | null
@@ -24,6 +25,10 @@ export interface GameState {
 export interface NPC {
   name: string,
   pos: Position,
+  redPassedByDirection: string,
+  bluePassedByDirection: string,
+  lastContactedRed: boolean,
+  lastContactedBlue: boolean,
   dialogue : string,
   isRedPassed: boolean,
   isBluePassed: boolean,
