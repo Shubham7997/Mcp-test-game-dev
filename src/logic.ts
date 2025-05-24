@@ -150,8 +150,8 @@ function getOppositeDir(dir: string, npcId: number): string{
 }
 
 function getDialogue(npc: NPC,
-   redPlayer : boolean,
-    bluePlayer : boolean,
+    redPlayer: boolean,
+    bluePlayer: boolean,
     npc_id: number
   ): string{
   if(redPlayer){
@@ -166,12 +166,25 @@ function getDialogue(npc: NPC,
         return "Can't say, but i think either "+ getOppositeDir(npc.bluePassedByDirection, npc_id) + " or " + npc.bluePassedByDirection
       }
     }
-  }
-  else{
+    else{
     return "Can't say, didn't see  anyone passing here or may be i missed it"
+   }
   }
-  else if(bluePlayer){
 
+  else if(bluePlayer){
+   if(npc.isRedPassed){
+      if(npc.sayTruth){
+        return "Yes, RED passed from here towards " + npc.redPassedByDirection
+      }
+      else if (npc.sayLie){
+        return "Yes, RED passed from here towards " + getOppositeDir(npc.redPassedByDirection, npc_id)
+      }
+      else if (npc.sayBluff){
+        return "Can't say, but i think either "+ getOppositeDir(npc.redPassedByDirection, npc_id) + " or " + npc.redPassedByDirection
+      }
+    }else{
+    return "Can't say, didn't see  anyone passing here or may be i missed it"
+   }
   }
  return ""
 }
