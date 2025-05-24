@@ -4,6 +4,20 @@ import type { GameState, NPC, Position } from "./types"
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
 
+const Npc_possible_dir= [
+  ["up","right","down"],
+  ["up","right","down"],
+  ["left","right","down"],
+  ["left","up","down"],
+  ["left","right","down"],
+  ["left","up","right","down"],
+  ["right","down","left","up"],
+  ["down","right","up","left"],
+  ["right","left","down"],
+  ["left","up","right","down"],
+  ["right","down","up"]
+]
+
 interface MovePayload {
   direction: "up" | "down" | "left" | "right"
 }
@@ -17,7 +31,8 @@ declare global {
 }
 
 const m1 =
-[[0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
+[
+[0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
 [0,1,0,0,0,0,0,0,1,1,1,1,1,2,0,0,0,0,0,0],
 [1,1,0,1,1,1,1,2,0,0,0,0,0,0,0,1,1,0,1,1],
 [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1],
@@ -93,7 +108,7 @@ function generateMaze(size: number): boolean[][] {
   const maze: boolean[][] = Array(size)
     .fill(null)
     .map(() => Array(size).fill(false))
-    
+
   //hardcoded maze1
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -121,6 +136,44 @@ function isValidMove(pos: Position, maze: boolean[][]): boolean {
     pos.y < maze.length &&
     !maze[pos.y][pos.x]
   )
+}
+
+function getRandomDir(dirs: string[], exclude: string): string{
+  var temp = structuredClone(dirs)
+  var temp1 = temp.filter(t=> t!== exclude)
+  var res = temp1[Math.floor(Math.random()*temp1.length)]
+  return res
+}
+
+function getOppositeDir(dir: string, npcId: number): string{
+    return getRandomDir(Npc_possible_dir[npcId], dir)
+}
+
+function getDialogue(npc: NPC,
+   redPlayer : boolean,
+    bluePlayer : boolean,
+    npc_id: number
+  ): string{
+  if(redPlayer){
+    if(npc.isBluePassed){
+      if(npc.sayTruth){
+        return "Yes, BLUE passed from here towards " + npc.bluePassedByDirection
+      }
+      else if (npc.sayLie){
+        return "Yes, BLUE passed from here towards " + getOppositeDir(npc.bluePassedByDirection, npc_id)
+      }
+      else if (npc.sayBluff){
+        return "Can't say, but i think either "+ getOppositeDir(npc.bluePassedByDirection, npc_id) + " or " + npc.bluePassedByDirection
+      }
+    }
+  }
+  else{
+    return "Can't say, didn't see  anyone passing here or may be i missed it"
+  }
+  else if(bluePlayer){
+
+  }
+ return ""
 }
 
 function isEscapePoint(pos: Position): boolean {
