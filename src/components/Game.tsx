@@ -21,6 +21,7 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
   return (
     <div className="game-container">
       <div className="game-info">
+        
         <h2>You are: {playerRole} Ball</h2>
         {isBluePlayer && (
           <p className="game-hint">Escape to the top-left corner to win!</p>
@@ -28,6 +29,8 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
         {isRedPlayer && (
           <p className="game-hint">Catch the blue ball to win!</p>
         )}
+        <p className='game-hint'>Intel: {game.intelInfo}</p>
+        
       </div>
       
       <MazeGrid
@@ -35,6 +38,7 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
         redBall={game.redBall}
         blueBall={game.blueBall}
         gridSize={game.gridSize}
+        npcs={game.npcs}
       />
       
       {(isRedPlayer || isBluePlayer) && !game.gameOver && (

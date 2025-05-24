@@ -1,3 +1,4 @@
+import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_IMG_SRC_TYPES } from "react"
 import type { PlayerId } from "rune-sdk"
 
 export interface Position {
@@ -8,7 +9,9 @@ export interface Position {
 export interface GameState {
   redBall: Position
   blueBall: Position
-  maze: boolean[][]
+  maze: boolean[][],
+  npcs: NPC[],
+  intelInfo: string,
   gameOver: boolean
   winner: PlayerId | null
   playerRoles: {
@@ -16,4 +19,15 @@ export interface GameState {
     blue: PlayerId
   }
   gridSize: number
+}
+
+export interface NPC {
+  name: string,
+  pos: Position,
+  dialogue : string,
+  isRedPassed: boolean,
+  isBluePassed: boolean,
+  sayTruth: boolean,
+  sayLie: boolean,
+  sayBluff: boolean // this is bluff or riddle  
 }

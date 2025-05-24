@@ -1,8 +1,9 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
-import type { GameState, Position } from "./types"
+import type { GameState, NPC, Position } from "./types"
 
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
+const MAX_NPCS = 10
 
 interface MovePayload {
   direction: "up" | "down" | "left" | "right"
@@ -18,25 +19,51 @@ declare global {
 
 const m1 =
 [[0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
-[0,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0],
-[1,1,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,0,1,1],
+[0,1,0,0,0,0,0,0,1,1,1,1,1,2,0,0,0,0,0,0],
+[1,1,0,1,1,1,1,2,0,0,0,0,0,0,0,1,1,0,1,1],
 [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1],
-[0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,0,0,0],
-[1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1],
+[0,0,2,0,0,0,0,0,1,1,1,1,1,0,0,1,1,0,0,0],
+[1,1,0,1,1,1,1,null,1,1,0,0,0,0,0,0,0,2,1,1],
 [1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,0,1,1],
-[1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1],
-[1,0,1,1,0,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0],
+[1,0,0,0,2,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1],
+[1,0,1,1,0,1,1,0,0,0,2,0,0,0,1,1,1,0,0,0],
 [1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1,1,1,0],
 [1,0,0,0,0,0,0,0,1,1,0,1,1,0,1,1,1,0,1,0],
 [1,0,1,1,0,1,1,0,0,0,0,0,0,0,1,1,1,0,1,0],
 [0,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0],
-[1,0,0,0,0,0,0,0,1,1,0,1,1,0,1,1,1,1,1,1],
-[1,0,1,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],
+[1,0,0,0,2,0,0,0,1,1,0,1,1,0,1,1,1,1,1,1],
+[1,0,1,1,0,1,1,0,1,1,0,0,0,2,0,0,2,0,0,0],
 [1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
 [1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
-[0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0],
+[0,0,0,0,0,0,0,2,0,0,0,1,1,0,1,1,0,0,0,0],
 [1,0,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,0],
 [1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0]]
+
+// npc positions
+function generateNPCs() : NPC[]{
+  var resnpcs: NPC[] = []
+
+  for (let i=0; i < GRID_SIZE; i++){
+    for (let j =0; j < GRID_SIZE; j++){
+      if (m1[i][j] == 2){
+        var newNpc = {
+        name : "unknown",
+        pos : {x: j, y: i},
+        dialogue : "hello",
+        isRedPassed: false,
+        isBluePassed : false,
+        sayTruth: true,
+        sayLie: false,
+        sayBluff: false
+    }
+    resnpcs.push(newNpc)
+        
+      }
+    }
+  }
+
+  return resnpcs
+}
 
 // Generate a simple maze with some random walls
 function generateMaze(size: number): boolean[][] {
@@ -113,6 +140,8 @@ Rune.initLogic({
       redBall: { x: 1, y: 1 },
       blueBall: { x: GRID_SIZE - 2, y: GRID_SIZE - 2 },
       maze: generateMaze(GRID_SIZE),
+      npcs: generateNPCs(),
+      intelInfo : "",
       gameOver: false,
       winner: null,
       playerRoles: {
@@ -146,6 +175,47 @@ Rune.initLogic({
       } else {
         game.blueBall = newPos
       }
+
+      // check npcs
+      var r = ""
+      game.npcs.forEach((npc) =>{
+        if (npc.pos.x === newPos.x && npc.pos.y === newPos.y){
+          if (isRedPlayer){
+            npc.isRedPassed = true
+            if (npc.isBluePassed){
+              if (npc.sayTruth){
+
+              }
+              if(npc.sayLie){
+
+              }
+              if (npc.sayBluff){
+
+              }
+            }
+            r = npc.name + " says '"+ npc.dialogue  +"'"
+          } 
+          if (isBluePlayer){
+            npc.isBluePassed = true
+            if (npc.isRedPassed){
+              if (npc.sayTruth){
+
+              }
+              if (npc.sayLie){
+
+              }
+              else if (npc.sayBluff){
+
+              }
+              r = npc.name + " says '"+ npc.dialogue + "'"
+            }
+          }
+        }
+        else{
+          game.intelInfo = r
+        }
+      }
+    )
 
       // Check win conditions
       if (isCaught(game.redBall, game.blueBall)) {

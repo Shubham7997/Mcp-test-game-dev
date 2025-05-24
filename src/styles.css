@@ -73,6 +73,11 @@ html {
   box-shadow: 0 0 10px #55f;
 }
 
+.orange-ball {
+  background: orangered;
+  box-shadow: 0 0 10px orangered;
+}
+
 .controls {
   display: flex;
   flex-direction: column;
