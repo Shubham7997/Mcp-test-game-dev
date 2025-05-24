@@ -200,6 +200,42 @@ Rune.initLogic({
         game.blueBall = newPos
       }
 
+      //check for last npc
+    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedRed && isRedPlayer){
+      var t = game.lastNpc
+      if (newPos.x > game.npcs[t].pos.x){
+        game.npcs[t].redPassedByDirection = "right"
+      }
+      else if (newPos.x < game.npcs[t].pos.x){
+        game.npcs[t].redPassedByDirection = "left"
+      }
+      else if (newPos.y > game.npcs[t].pos.y){
+        game.npcs[t].redPassedByDirection = "down"
+      }
+      else if (newPos.y < game.npcs[t].pos.y){
+        game.npcs[t].redPassedByDirection = "up"
+      }
+      game.npcs[t].lastContactedRed = false
+      game.lastNpc = -1
+    }
+
+    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedBlue && isBluePlayer){
+     var t = game.lastNpc
+      if (newPos.x > game.npcs[t].pos.x){
+        game.npcs[t].bluePassedByDirection = "right"
+     }
+      else if (newPos.x < game.npcs[t].pos.x){
+        game.npcs[t].bluePassedByDirection = "left"
+     }
+       else if (newPos.y > game.npcs[t].pos.y){
+        game.npcs[t].bluePassedByDirection = "down"
+     }
+       else if (newPos.y < game.npcs[t].pos.y){
+        game.npcs[t].bluePassedByDirection = "up"
+      }
+    game.npcs[t].lastContactedBlue = false
+    game.lastNpc = -1                                                                                     
+    }
       // check npcs
       var r = ""
       game.npcs.forEach((npc,index) =>{
@@ -250,42 +286,7 @@ Rune.initLogic({
       }
     )
 
-    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedRed && isRedPlayer){
-      var t = game.lastNpc
-      if (newPos.x > game.npcs[t].pos.x){
-        game.npcs[t].redPassedByDirection = "right"
-      }
-      else if (newPos.x < game.npcs[t].pos.x){
-        game.npcs[t].redPassedByDirection = "left"
-      }
-      else if (newPos.y > game.npcs[t].pos.y){
-        game.npcs[t].redPassedByDirection = "down"
-      }
-      else if (newPos.y < game.npcs[t].pos.y){
-        game.npcs[t].redPassedByDirection = "up"
-      }
-      game.npcs[t].lastContactedRed = false
-      game.lastNpc = -1
-    }
 
-    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedBlue && isBluePlayer){
-     var t = game.lastNpc
-      if (newPos.x > game.npcs[t].pos.x){
-        game.npcs[t].bluePassedByDirection = "right"
-     }
-      else if (newPos.x < game.npcs[t].pos.x){
-        game.npcs[t].bluePassedByDirection = "left"
-     }
-       else if (newPos.y > game.npcs[t].pos.y){
-        game.npcs[t].bluePassedByDirection = "down"
-     }
-       else if (newPos.y < game.npcs[t].pos.y){
-        game.npcs[t].bluePassedByDirection = "up"
-      }
-    game.npcs[t].lastContactedBlue = false
-    game.lastNpc = -1
-                                                                                                
-    }
 
       // Check win conditions
       if (isCaught(game.redBall, game.blueBall)) {
