@@ -39,6 +39,25 @@ const m1 =
 [1,0,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,0],
 [1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0]]
 
+
+function generateDummyNpc() : NPC {
+  var newNpc: NPC = {
+    name : "dummy",
+    pos : {x: -1, y: -1},
+    dialogue : "hello",
+    redPassedByDirection: "",
+    bluePassedByDirection: "",
+    lastContactedRed: false, // last frame contact or not
+    lastContactedBlue: false,
+    isRedPassed: false,
+    isBluePassed : false,
+    sayTruth: true,
+    sayLie: false,
+    sayBluff: false
+  }
+  return newNpc
+}
+
 // npc positions
 function generateNPCs() : NPC[]{
   var resnpcs: NPC[] = []
@@ -145,6 +164,7 @@ Rune.initLogic({
       blueBall: { x: GRID_SIZE - 2, y: GRID_SIZE - 2 },
       maze: generateMaze(GRID_SIZE),
       npcs: generateNPCs(),
+      lastNpc: -1,
       intelInfo : "",
       gameOver: false,
       winner: null,
@@ -182,15 +202,17 @@ Rune.initLogic({
 
       // check npcs
       var r = ""
-      game.npcs.forEach((npc) =>{
+      game.npcs.forEach((npc,index) =>{
         if (npc.pos.x === newPos.x && npc.pos.y === newPos.y){
-          game.lastNpc = npc
+          game.lastNpc = index
           if (isRedPlayer){
+            var saying : string= ""
             npc.isRedPassed = true
             npc.lastContactedRed = true
             if (npc.isBluePassed){
               if (npc.sayTruth){
-
+                saying = npc.bluePassedByDirection
+                //console.log(npc.bluePassedByDirection)
               }
               if(npc.sayLie){
 
@@ -198,15 +220,18 @@ Rune.initLogic({
               if (npc.sayBluff){
 
               }
+              r = "blue passed " + npc.bluePassedByDirection
             }
-            r = npc.name + " says '"+ npc.dialogue  +"'"
+            //r = npc.name + " says '"+ npc.bluePassedByDirection  +"'"
           } 
           if (isBluePlayer){
+            var saying : string= ""
             npc.isBluePassed = true
             npc.lastContactedBlue = true
             if (npc.isRedPassed){
               if (npc.sayTruth){
-
+                saying = npc.redPassedByDirection
+                //console.log(npc.redPassedByDirection)
               }
               if (npc.sayLie){
 
@@ -214,8 +239,9 @@ Rune.initLogic({
               else if (npc.sayBluff){
 
               }
-              r = npc.name + " says '"+ npc.dialogue + "'"
+              r = "red passed by " + npc.redPassedByDirection
             }
+           // r = npc.name + " says '"+ npc.redPassedByDirection + "'" 
           }
         }
         else{
@@ -224,20 +250,41 @@ Rune.initLogic({
       }
     )
 
-    if (game.lastNpc.lastContactedRed && isRedPlayer){
-      if (newPos.x > game.lastNpc.pos.x){
-        game.lastNpc.redPassedByDirection = "right"
+    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedRed && isRedPlayer){
+      var t = game.lastNpc
+      if (newPos.x > game.npcs[t].pos.x){
+        game.npcs[t].redPassedByDirection = "right"
       }
-      else if (newPos.x < game.lastNpc.pos.x){
-        game.lastNpc.redPassedByDirection = "left"
+      else if (newPos.x < game.npcs[t].pos.x){
+        game.npcs[t].redPassedByDirection = "left"
       }
-      else if (newPos.y > game.lastNpc.pos.y){
-        game.lastNpc.redPassedByDirection = "down"
+      else if (newPos.y > game.npcs[t].pos.y){
+        game.npcs[t].redPassedByDirection = "down"
       }
-      else if (newPos.y < game.lastNpc.pos.y){
-        game.lastNpc.redPassedByDirection = "up"
+      else if (newPos.y < game.npcs[t].pos.y){
+        game.npcs[t].redPassedByDirection = "up"
       }
-      lastNpc.lastContactedRed = false
+      game.npcs[t].lastContactedRed = false
+      game.lastNpc = -1
+    }
+
+    if (game.lastNpc !== -1 && game.npcs[game.lastNpc].lastContactedBlue && isBluePlayer){
+     var t = game.lastNpc
+      if (newPos.x > game.npcs[t].pos.x){
+        game.npcs[t].bluePassedByDirection = "right"
+     }
+      else if (newPos.x < game.npcs[t].pos.x){
+        game.npcs[t].bluePassedByDirection = "left"
+     }
+       else if (newPos.y > game.npcs[t].pos.y){
+        game.npcs[t].bluePassedByDirection = "down"
+     }
+       else if (newPos.y < game.npcs[t].pos.y){
+        game.npcs[t].bluePassedByDirection = "up"
+      }
+    game.npcs[t].lastContactedBlue = false
+    game.lastNpc = -1
+                                                                                                
     }
 
       // Check win conditions
