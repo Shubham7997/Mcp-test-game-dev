@@ -3,7 +3,6 @@ import type { GameState, NPC, Position } from "./types"
 
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
-const MAX_NPCS = 10
 
 interface MovePayload {
   direction: "up" | "down" | "left" | "right"
@@ -23,7 +22,7 @@ const m1 =
 [1,1,0,1,1,1,1,2,0,0,0,0,0,0,0,1,1,0,1,1],
 [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1],
 [0,0,2,0,0,0,0,0,1,1,1,1,1,0,0,1,1,0,0,0],
-[1,1,0,1,1,1,1,null,1,1,0,0,0,0,0,0,0,2,1,1],
+[1,1,0,1,1,1,1,0,1,1,0,0,0,0,0,0,0,2,1,1],
 [1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,0,1,1],
 [1,0,0,0,2,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1],
 [1,0,1,1,0,1,1,0,0,0,2,0,0,0,1,1,1,0,0,0],
@@ -35,9 +34,10 @@ const m1 =
 [1,0,1,1,0,1,1,0,1,1,0,0,0,2,0,0,2,0,0,0],
 [1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
 [1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
-[0,0,0,0,0,0,0,2,0,0,0,1,1,0,1,1,0,0,0,0],
+[0,2,0,0,0,0,0,2,0,0,0,1,1,0,1,1,0,0,0,0],
 [1,0,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,0],
-[1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0]]
+[1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0],
+[1,1,1,1,1,1,1,2,1,1,1,1,,1,1,1,1,1,1,1,1]]
 
 
 function generateDummyNpc() : NPC {
@@ -62,7 +62,7 @@ function generateDummyNpc() : NPC {
 function generateNPCs() : NPC[]{
   var resnpcs: NPC[] = []
 
-  for (let i=0; i < GRID_SIZE; i++){
+  for (let i=0; i < GRID_SIZE+1; i++){
     for (let j =0; j < GRID_SIZE; j++){
       if (m1[i][j] == 2){
         var newNpc = {
@@ -93,8 +93,7 @@ function generateMaze(size: number): boolean[][] {
   const maze: boolean[][] = Array(size)
     .fill(null)
     .map(() => Array(size).fill(false))
-
-  // Add some random walls (30% chance of wall)
+    
   //hardcoded maze1
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -109,7 +108,7 @@ function generateMaze(size: number): boolean[][] {
   // Ensure start and end positions are clear
   maze[1][1] = false // Red ball start
   maze[size - 2][size - 2] = false // Blue ball start
-  maze[0][0] = false // Blue ball escape point
+  maze[0][10] = false // Blue ball escape point
 
   return maze
 }
@@ -125,7 +124,7 @@ function isValidMove(pos: Position, maze: boolean[][]): boolean {
 }
 
 function isEscapePoint(pos: Position): boolean {
-  return pos.x === 0 && pos.y === 0
+  return pos.x === 10 && pos.y === 0
 }
 
 function getNewPosition(
@@ -256,9 +255,9 @@ Rune.initLogic({
               if (npc.sayBluff){
 
               }
-              r = "blue passed " + npc.bluePassedByDirection
+              //r = "blue passed " + npc.bluePassedByDirection
             }
-            //r = npc.name + " says '"+ npc.bluePassedByDirection  +"'"
+            r = npc.name + " says '"+ saying  +"'"
           } 
           if (isBluePlayer){
             var saying : string= ""
@@ -275,9 +274,9 @@ Rune.initLogic({
               else if (npc.sayBluff){
 
               }
-              r = "red passed by " + npc.redPassedByDirection
+              //r = "red passed by " + npc.redPassedByDirection
             }
-           // r = npc.name + " says '"+ npc.redPassedByDirection + "'" 
+            r = npc.name + " says '"+ saying + "'" 
           }
         }
         else{

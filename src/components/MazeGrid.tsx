@@ -1,5 +1,5 @@
 import React from 'react'
-import { Position } from '../types'
+import { Position, NPC } from '../types'
 
 interface MazeGridProps {
   maze: boolean[][]
@@ -10,22 +10,21 @@ interface MazeGridProps {
 }
 
 const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, gridSize }) => {
-  return (
-    <div 
-      className="maze-grid"
+  return ( 
+  <div className="maze-grid"
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
         gap: '1px',
         background: '#333',
         padding: '2px',
-      }}
-    >
+      }}>
       {maze.map((row, y) =>
         row.map((isWall, x) => {
           const hasRedBall = redBall.x === x && redBall.y === y
           const hasBlueBall = blueBall.x === x && blueBall.y === y
-          const isEscapePoint = x === 0 && y === 0
+          const isEscapePoint = x === 10 && y === 0
+          
     
 
           return (

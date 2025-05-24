@@ -19,7 +19,7 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
   }
 
   return (
-    <div className="game-container">
+    <div classNamesName="game-container">
       <div className="game-info">
         
         <h2>You are: {playerRole} Ball</h2>
