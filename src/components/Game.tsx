@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { isValidElement } from 'react'
 import { GameState } from '../types'
 import { PlayerId } from 'rune-sdk'
 import Controls from './Controls'
@@ -19,27 +19,42 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
   }
 
   return (
-    <div classNamesName="game-container">
+    <div className="game-container">
       <div className="game-info">
-        
-        <h2>You are: {playerRole} Ball</h2>
-        {isBluePlayer && (
-          <p className="game-hint">Escape to the top-left corner to win!</p>
+        <h4>You are: {playerRole} Ball</h4>
+        {isBluePlayer && (<div>
+          <p className="game-hint">Find the ESCAPE to win!</p>
+          <p className='intel-box'>{game.blueIntelInfo}</p></div>
         )}
         {isRedPlayer && (
-          <p className="game-hint">Catch the blue ball to win!</p>
+          <div>
+          <p className="game-hint">Catch the BLUE to win!</p>
+          <p className='intel-box'>{game.redIntelInfo}</p>
+          </div>
         )}
-        <p className='game-hint'>Intel: {game.intelInfo}</p>
         
       </div>
       
+      {isRedPlayer && (
       <MazeGrid
         maze={game.maze}
         redBall={game.redBall}
         blueBall={game.blueBall}
         gridSize={game.gridSize}
         npcs={game.npcs}
-      />
+        viewPort={game.redBall}
+      />)}
+
+      {isBluePlayer && (
+        <MazeGrid
+                maze={game.maze}
+                        redBall={game.redBall}
+                                blueBall={game.blueBall}
+                                        gridSize={game.gridSize}
+                                                npcs={game.npcs}
+                                                viewPort={game.blueBall}
+                                                      />
+      )}
       
       {(isRedPlayer || isBluePlayer) && !game.gameOver && (
         <Controls onMove={handleMove} />

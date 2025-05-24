@@ -1,6 +1,6 @@
 import "./styles.css"
 import { GameState } from "./types"
-/*
+
 const CELL_SIZE = 30 // Size of each grid cell in pixels
 const RED_COLOR = "#ff4444"
 const BLUE_COLOR = "#4444ff"
@@ -147,4 +147,4 @@ Rune.initClient({
     drawMaze(game)
     updatePlayerInfo(game, yourPlayerId)
   },
-})*/
+})

@@ -1,5 +1,6 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 import type { GameState, NPC, Position } from "./types"
+import { renderToString } from "react-dom/server"
 
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
@@ -66,9 +67,9 @@ function generateDummyNpc() : NPC {
     lastContactedBlue: false,
     isRedPassed: false,
     isBluePassed : false,
-    sayTruth: true,
-    sayLie: false,
-    sayBluff: false
+    sayTruth: Math.random()>= .5,
+    sayLie: Math.random()>=.5,
+    sayBluff: Math.random()>=.5
   }
   return newNpc
 }
@@ -167,7 +168,7 @@ function getDialogue(npc: NPC,
       }
     }
     else{
-    return "Can't say, didn't see  anyone passing here or may be i missed it"
+    return "Can't say, if seen anyone passing here"
    }
   }
 
@@ -183,7 +184,7 @@ function getDialogue(npc: NPC,
         return "Can't say, but i think either "+ getOppositeDir(npc.redPassedByDirection, npc_id) + " or " + npc.redPassedByDirection
       }
     }else{
-    return "Can't say, didn't see  anyone passing here or may be i missed it"
+    return "Can't say, if seen anyone passing here"
    }
   }
  return ""
@@ -230,7 +231,8 @@ Rune.initLogic({
       maze: generateMaze(GRID_SIZE),
       npcs: generateNPCs(),
       lastNpc: -1,
-      intelInfo : "",
+      redIntelInfo : "",
+      blueIntelInfo:"",
       gameOver: false,
       winner: null,
       playerRoles: {
@@ -302,54 +304,32 @@ Rune.initLogic({
     game.lastNpc = -1                                                                                     
     }
       // check npcs
-      var r = ""
+      let rr = ""
+      let br = ""
       game.npcs.forEach((npc,index) =>{
         if (npc.pos.x === newPos.x && npc.pos.y === newPos.y){
           game.lastNpc = index
           if (isRedPlayer){
-            var saying : string= ""
+            
             npc.isRedPassed = true
             npc.lastContactedRed = true
-            if (npc.isBluePassed){
-              if (npc.sayTruth){
-                saying = npc.bluePassedByDirection
-                //console.log(npc.bluePassedByDirection)
-              }
-              if(npc.sayLie){
-
-              }
-              if (npc.sayBluff){
-
-              }
-              //r = "blue passed " + npc.bluePassedByDirection
-            }
-            r = npc.name + " says '"+ saying  +"'"
-          } 
+            rr = npc.name + " says '" + getDialogue(npc, isRedPlayer, isBluePlayer, index) + "'"
+            game.redIntelInfo = rr
+          }
           if (isBluePlayer){
-            var saying : string= ""
+            
             npc.isBluePassed = true
             npc.lastContactedBlue = true
-            if (npc.isRedPassed){
-              if (npc.sayTruth){
-                saying = npc.redPassedByDirection
-                //console.log(npc.redPassedByDirection)
-              }
-              if (npc.sayLie){
-
-              }
-              else if (npc.sayBluff){
-
-              }
-              //r = "red passed by " + npc.redPassedByDirection
-            }
-            r = npc.name + " says '"+ saying + "'" 
-          }
-        }
-        else{
-          game.intelInfo = r
-        }
+            br = npc.name + " says '"+ getDialogue(npc, isRedPlayer, isBluePlayer, index) + "'" 
+            game.blueIntelInfo = br
+          } 
       }
-    )
+    })
+      
+        if (isBluePlayer){game.blueIntelInfo= br}
+        if(isRedPlayer){game.redIntelInfo = rr}
+      
+
 
 
 

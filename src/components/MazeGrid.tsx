@@ -1,15 +1,18 @@
 import React from 'react'
 import { Position, NPC } from '../types'
+import Game from './Game'
 
 interface MazeGridProps {
   maze: boolean[][]
   npcs: NPC[],
   redBall: Position
   blueBall: Position
-  gridSize: number
+  gridSize: number,
+  viewPort: Position
 }
 
-const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, gridSize }) => {
+const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, gridSize, viewPort
+ }) => {
   return ( 
   <div className="maze-grid"
       style={{
@@ -19,15 +22,19 @@ const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, grid
         background: '#333',
         padding: '2px',
       }}>
-      {maze.map((row, y) =>
-        row.map((isWall, x) => {
+        
+      {
+      maze.map((row, y) =>
+        row.
+        map((isWall, x) => {
+
           const hasRedBall = redBall.x === x && redBall.y === y
           const hasBlueBall = blueBall.x === x && blueBall.y === y
           const isEscapePoint = x === 10 && y === 0
-          
     
 
-          return (
+         return 7-viewPort.x > x && 
+         (y > viewPort.y -3) && y < viewPort.y  +4 &&(
             <div
               key={`${x}-${y}`}
               className={`cell ${isWall ? 'wall' : ''} ${
