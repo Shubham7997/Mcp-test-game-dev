@@ -45,5 +45,6 @@ export interface MAZE{
   possibleEscapePoints: Position[],
   possibleRedPoints: Position[],
   possibleBluePoints: Position[],
-  mazeMapArray: number[][]
+  mazeMapArray: number[][],
+  npcPossibleDirs: string[][]
 }

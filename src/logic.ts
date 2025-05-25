@@ -4,7 +4,7 @@ import { renderToString } from "react-dom/server"
 
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
-const Npc_possible_dir= [
+const m1_Npc_possible_dir: string[][]= [
   ["up","right","down"],
   ["up","right","down"],
   ["left","right","down"],
@@ -46,17 +46,18 @@ const mazes_configs: MAZE[] =[
   {
     name: "m1", 
     possibleEscapePoints: [
-      {x:0, y: 0}, {x: 12, y:0}
+      {x:0, y: 0}, {x: 14, y:0}, {x: 0, y: 12}, {x: 17, y:7}, {x:9, y:9}
     ], 
     possibleRedPoints:
     [
-      {x: 1,y:1}
+      {x: 1,y:1}, {x: 1, y:7}, {x:10, y:5}
     ],
     possibleBluePoints:
     [
-      {x: 18, y: 18}
+      {x: 18, y: 18}, {x: 19, y:12}, {x:10, y: 19}
     ],
-    mazeMapArray: m1
+    mazeMapArray: m1,
+    npcPossibleDirs: m1_Npc_possible_dir
   }
 ]
 
@@ -72,31 +73,6 @@ declare global {
   const Rune: RuneClient<GameState, GameActions>
 }
 
-const m1 : number[][]=
-[
-[0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
-[0,1,0,0,0,0,0,0,1,1,1,1,1,2,0,0,0,0,0,0],
-[1,1,0,1,1,1,1,2,0,0,0,0,0,0,0,1,1,0,1,1],
-[1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1],
-[0,0,2,0,0,0,0,0,1,1,1,1,1,0,0,1,1,0,0,0],
-[1,1,0,1,1,1,1,0,1,1,0,0,0,0,0,0,0,2,1,1],
-[1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,0,1,1],
-[1,0,0,0,2,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1],
-[1,0,1,1,0,1,1,0,0,0,2,0,0,0,1,1,1,0,0,0],
-[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1,1,1,0],
-[1,0,0,0,0,0,0,0,1,1,0,1,1,0,1,1,1,0,1,0],
-[1,0,1,1,0,1,1,0,0,0,0,0,0,0,1,1,1,0,1,0],
-[0,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0],
-[1,0,0,0,2,0,0,0,1,1,0,1,1,0,1,1,1,1,1,1],
-[1,0,1,1,0,1,1,0,1,1,0,0,0,2,0,0,2,0,0,0],
-[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
-[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
-[0,2,0,0,0,0,0,2,0,0,0,1,1,0,1,1,0,0,0,0],
-[1,0,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,0],
-[1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0],
-[1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1]
-]
-
 
 function InitializeMaze(): number{
   return Math.floor(Math.random()*mazes_configs.length)
@@ -110,26 +86,27 @@ function initEscapePoint(index: number): Position{
   ]
 }
 
-const current_maze: number = InitializeMaze()
-
-
-function generateDummyNpc() : NPC {
-  var newNpc: NPC = {
-    name : "dummy",
-    pos : {x: -1, y: -1},
-    dialogue : "hello",
-    redPassedByDirection: "",
-    bluePassedByDirection: "",
-    lastContactedRed: false, // last frame contact or not
-    lastContactedBlue: false,
-    isRedPassed: false,
-    isBluePassed : false,
-    sayTruth: Math.random()>= .5,
-    sayLie: Math.random()>=.5,
-    sayBluff: Math.random()>=.5
-  }
-  return newNpc
+function initRedPoint(index: number): Position{
+  return mazes_configs[index]
+  .possibleRedPoints[
+    Math.floor(Math.random()
+    * mazes_configs[index].possibleRedPoints.length)
+  ]
 }
+
+function initBluePoint(index: number): Position{
+  return mazes_configs[index]
+  .possibleBluePoints[
+    Math.floor(Math.random()
+  * mazes_configs[index].possibleBluePoints.length)
+  ]
+}
+
+
+const current_maze: number = InitializeMaze()
+const selectedEscape: Position = initEscapePoint(current_maze)
+const selectedRedPoint: Position = initRedPoint(current_maze)
+const selectedBluePoint: Position = initBluePoint(current_maze)
 
 // npc positions
 function generateNPCs() : NPC[]{
@@ -137,7 +114,8 @@ function generateNPCs() : NPC[]{
 
   for (let i=0; i < GRID_SIZE+1; i++){
     for (let j =0; j < GRID_SIZE; j++){
-      if (m1[i][j] == 2){
+      if (mazes_configs[current_maze].mazeMapArray[i][j] == 2){
+        var m= 1+Math.floor(Math.random()*99)%3
         var newNpc = {
         name : "unknown",
         pos : {x: j, y: i},
@@ -148,9 +126,9 @@ function generateNPCs() : NPC[]{
         lastContactedBlue: false,
         isRedPassed: false,
         isBluePassed : false,
-        sayTruth: true,
-        sayLie: false,
-        sayBluff: false
+        sayTruth: m===1,
+        sayLie: m===2,
+        sayBluff: m===3
     }
     resnpcs.push(newNpc)
         
@@ -170,7 +148,7 @@ function generateMaze(size: number): boolean[][] {
   //hardcoded maze1
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      if (m1[y][x] == 1) {
+      if (mazes_configs[current_maze].mazeMapArray[y][x] == 1) {
         maze[y][x] = true
       }
     }
@@ -179,9 +157,9 @@ function generateMaze(size: number): boolean[][] {
  
 
   // Ensure start and end positions are clear
-  maze[1][1] = false // Red ball start
-  maze[size - 2][size - 2] = false // Blue ball start
-  maze[0][10] = false // Blue ball escape point
+  maze[selectedRedPoint.y][selectedRedPoint.x] = false // Red ball start
+  maze[selectedBluePoint.y][selectedBluePoint.x] = false // Blue ball start
+  maze[selectedEscape.y][selectedEscape.x] = false // Blue ball escape point
 
   return maze
 }
@@ -204,44 +182,62 @@ function getRandomDir(dirs: string[], exclude: string): string{
 }
 
 function getOppositeDir(dir: string, npcId: number): string{
-    return getRandomDir(Npc_possible_dir[npcId], dir)
+    return getRandomDir(
+      mazes_configs[current_maze]
+      .npcPossibleDirs[npcId], dir).toUpperCase()
 }
 
 function getDialogue(npc: NPC,
     redPlayer: boolean,
     bluePlayer: boolean,
     npc_id: number
-  ): string{
+  ): string {
   if(redPlayer){
     if(npc.isBluePassed){
       if(npc.sayTruth){
-        return "Yes, BLUE passed from here towards " + npc.bluePassedByDirection
+        return "Yes, BLUE passed from here towards " + npc.bluePassedByDirection.toUpperCase()
       }
       else if (npc.sayLie){
         return "Yes, BLUE passed from here towards " + getOppositeDir(npc.bluePassedByDirection, npc_id)
       }
       else if (npc.sayBluff){
-        return "Can't say, but i think either "+ getOppositeDir(npc.bluePassedByDirection, npc_id) + " or " + npc.bluePassedByDirection
+        return "Can't say, but i think BLUE went either towards "+ getOppositeDir(npc.bluePassedByDirection, npc_id) + " or " + npc.bluePassedByDirection.toUpperCase()
       }
     }
     else{
-    return "Can't say, if seen anyone passing here"
-   }
+      if(npc.sayTruth){
+        return "No, didn't seen anyone passing or may be missed it"
+      }
+      else if (npc.sayLie){
+        return "Yes, BLUE passed from here towards " + getOppositeDir("", npc_id)
+      }
+      else if (npc.sayBluff){
+        return "Can't say, but i think BLUE went towards "+ getOppositeDir("", npc_id) 
+      }
+    }
   }
 
   else if(bluePlayer){
    if(npc.isRedPassed){
       if(npc.sayTruth){
-        return "Yes, RED passed from here towards " + npc.redPassedByDirection
+        return "Yes, RED passed from here towards " + npc.redPassedByDirection.toUpperCase()
       }
       else if (npc.sayLie){
         return "Yes, RED passed from here towards " + getOppositeDir(npc.redPassedByDirection, npc_id)
       }
       else if (npc.sayBluff){
-        return "Can't say, but i think either "+ getOppositeDir(npc.redPassedByDirection, npc_id) + " or " + npc.redPassedByDirection
+        return "Can't say, but i think RED went either towards "+ getOppositeDir(npc.redPassedByDirection, npc_id) + " or " + npc.redPassedByDirection.toUpperCase()
       }
     }else{
-    return "Can't say, if seen anyone passing here"
+    if(npc.sayTruth){
+        return "No, didn't seen anyone passing or may be missed it"
+      }
+      else if (npc.sayLie){
+        return "Yes, RED passed from here towards " + getOppositeDir("", npc_id)
+      }
+      else if (npc.sayBluff){
+        return "Can't say, but i think RED went towards "+ getOppositeDir("", npc_id)
+      }
    }
   }
  return ""
@@ -283,8 +279,8 @@ Rune.initLogic({
   setup: (allPlayerIds): GameState => {
     // Initialize game state
     return {
-      redBall: { x: 1, y: 1 },
-      blueBall: { x: GRID_SIZE - 2, y: GRID_SIZE - 2 },
+      redBall: { x: selectedRedPoint.x, y: selectedRedPoint.y },
+      blueBall: { x: selectedBluePoint.x, y: selectedBluePoint.y },
       maze: generateMaze(GRID_SIZE),
       npcs: generateNPCs(),
       lastNpc: -1,
@@ -298,7 +294,7 @@ Rune.initLogic({
       },
       gridSize: GRID_SIZE,
       currentMaze : mazes_configs[current_maze],
-      escapePoint: initEscapePoint(current_maze)
+      escapePoint: selectedEscape
     }
   },
   actions: {
