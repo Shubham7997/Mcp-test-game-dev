@@ -1,10 +1,9 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
-import type { GameState, NPC, Position } from "./types"
+import type { GameState, MAZE, NPC, Position } from "./types"
 import { renderToString } from "react-dom/server"
 
 const GRID_SIZE = 20 // 15x15 grid for the maze
 const PLAYER_SPEED = 1 // How far a player can move in one action
-
 const Npc_possible_dir= [
   ["up","right","down"],
   ["up","right","down"],
@@ -19,6 +18,24 @@ const Npc_possible_dir= [
   ["right","down","up"]
 ]
 
+const mazes_configs: MAZE[] =[
+  {
+    name: "m1", 
+    possibleEscapePoints: [
+      {x:0, y: 0}, {x: 12, y:0}
+    ], 
+    possibleRedPoints:
+    [
+      {x: 1,y:1}
+    ],
+    possibleBluePoints:
+    [
+      {x: 18, y: 18}
+    ],
+    mazeMapArray: m1
+  }
+]
+
 interface MovePayload {
   direction: "up" | "down" | "left" | "right"
 }
@@ -31,7 +48,7 @@ declare global {
   const Rune: RuneClient<GameState, GameActions>
 }
 
-const m1 =
+const m1 : number[][]=
 [
 [0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
 [0,1,0,0,0,0,0,0,1,1,1,1,1,2,0,0,0,0,0,0],
@@ -53,7 +70,23 @@ const m1 =
 [0,2,0,0,0,0,0,2,0,0,0,1,1,0,1,1,0,0,0,0],
 [1,0,1,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,0],
 [1,0,1,1,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0],
-[1,1,1,1,1,1,1,2,1,1,1,1,,1,1,1,1,1,1,1,1]]
+[1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1]
+]
+
+
+function InitializeMaze(): number{
+  return Math.floor(Math.random()*mazes_configs.length)
+}
+
+function initEscapePoint(index: number): Position{
+  return mazes_configs[index]
+  .possibleEscapePoints[
+    Math.floor(Math.random() *
+    mazes_configs[index].possibleEscapePoints.length)
+  ]
+}
+
+const current_maze: number = InitializeMaze()
 
 
 function generateDummyNpc() : NPC {
@@ -190,8 +223,8 @@ function getDialogue(npc: NPC,
  return ""
 }
 
-function isEscapePoint(pos: Position): boolean {
-  return pos.x === 10 && pos.y === 0
+function isEscapePoint(pos: Position, escape_pos: Position): boolean {
+  return pos.x === escape_pos.x && pos.y === escape_pos.y
 }
 
 function getNewPosition(
@@ -240,6 +273,8 @@ Rune.initLogic({
         blue: allPlayerIds[1],
       },
       gridSize: GRID_SIZE,
+      currentMaze : mazes_configs[current_maze],
+      escapePoint: initEscapePoint(current_maze)
     }
   },
   actions: {
@@ -343,7 +378,7 @@ Rune.initLogic({
             [game.playerRoles.blue]: "LOST",
           },
         })
-      } else if (isEscapePoint(game.blueBall)) {
+      } else if (isEscapePoint(game.blueBall, game.escapePoint)) {
         game.gameOver = true
         game.winner = game.playerRoles.blue
         Rune.gameOver({

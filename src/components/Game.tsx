@@ -7,7 +7,7 @@ import MazeGrid from './MazeGrid'
 interface GameProps {
   game: GameState
   yourPlayerId: PlayerId | undefined
-}
+} 
 
 const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
   const isRedPlayer = yourPlayerId === game.playerRoles.red
@@ -43,6 +43,7 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
         gridSize={game.gridSize}
         npcs={game.npcs}
         viewPort={game.redBall}
+        escapePoint={game.escapePoint}
       />)}
 
       {isBluePlayer && (
@@ -53,6 +54,7 @@ const Game: React.FC<GameProps> = ({ game, yourPlayerId }) => {
                                         gridSize={game.gridSize}
                                                 npcs={game.npcs}
                                                 viewPort={game.blueBall}
+                                                escapePoint={game.escapePoint}
                                                       />
       )}
       

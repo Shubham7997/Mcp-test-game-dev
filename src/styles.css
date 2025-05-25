@@ -37,10 +37,11 @@ html {
   background: #222;
   border-radius: 8px;
   overflow: hidden;
+  display: grid;
 }
 
 .cell {
-  /*aspect-ratio: 1;*/
+  aspect-ratio: 1;
   background: #2a2a2a;
   display: flex;
   align-items: center;

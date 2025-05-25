@@ -20,7 +20,9 @@ export interface GameState {
     red: PlayerId
     blue: PlayerId
   }
-  gridSize: number
+  gridSize: number,
+  escapePoint: Position,
+  currentMaze: MAZE
 }
 
 export interface NPC {
@@ -36,4 +38,12 @@ export interface NPC {
   sayTruth: boolean,
   sayLie: boolean,
   sayBluff: boolean // this is bluff or riddle  
+}
+
+export interface MAZE{
+  name: string,
+  possibleEscapePoints: Position[],
+  possibleRedPoints: Position[],
+  possibleBluePoints: Position[],
+  mazeMapArray: number[][]
 }

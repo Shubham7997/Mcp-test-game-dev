@@ -8,16 +8,17 @@ interface MazeGridProps {
   redBall: Position
   blueBall: Position
   gridSize: number,
-  viewPort: Position
+  viewPort: Position,
+  escapePoint: Position
 }
 
-const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, gridSize, viewPort
+const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, gridSize, viewPort,
+  escapePoint
  }) => {
   return ( 
   <div className="maze-grid"
       style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+        gridTemplateColumns: `repeat(5, 1fr)`,
         gap: '1px',
         background: '#333',
         padding: '2px',
@@ -25,16 +26,26 @@ const MazeGrid: React.FC<MazeGridProps> = ({ maze, npcs, redBall, blueBall, grid
         
       {
       maze.map((row, y) =>
-        row.
-        map((isWall, x) => {
+        row
+        .map((isWall, x) => {
 
           const hasRedBall = redBall.x === x && redBall.y === y
           const hasBlueBall = blueBall.x === x && blueBall.y === y
-          const isEscapePoint = x === 10 && y === 0
+          const isEscapePoint = x === escapePoint.x && y === escapePoint.y
     
 
-         return 7-viewPort.x > x && 
-         (y > viewPort.y -3) && y < viewPort.y  +4 &&(
+         return  (
+          (viewPort.y < 2 && y < 5) 
+       ||  (viewPort.y >= 17 && y >= 15 && y < 20)
+      || (y >= viewPort.y - 2 && y <= viewPort.y + 2)
+        )
+         && (
+          (viewPort.x < 2 && x < 5)
+          || (viewPort.x >=17 && x >=15 && x < 20)
+          ||(x >= viewPort.x -2 && x <= viewPort.x +2)
+         )
+
+         && (
             <div
               key={`${x}-${y}`}
               className={`cell ${isWall ? 'wall' : ''} ${
