@@ -1,5 +1,5 @@
 {
-  "name": "Mcp-test-game-dev",
+  "name": "maze_chase",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "npm run lint && tsc && vite build",
     "upload": "npm run build && npx rune@latest upload",
-    "lint": "eslint src",
+    "lint": "eslint src --fix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

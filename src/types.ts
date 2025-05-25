@@ -1,4 +1,3 @@
-import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_IMG_SRC_TYPES } from "react"
 import type { PlayerId } from "rune-sdk"
 
 export interface Position {
@@ -9,42 +8,42 @@ export interface Position {
 export interface GameState {
   redBall: Position
   blueBall: Position
-  maze: boolean[][],
-  npcs: NPC[],
-  lastNpc: number,
-  redIntelInfo: string,
-  blueIntelInfo: string,
+  maze: boolean[][]
+  npcs: NPC[]
+  lastNpc: number
+  redIntelInfo: string
+  blueIntelInfo: string
   gameOver: boolean
   winner: PlayerId | null
   playerRoles: {
     red: PlayerId
     blue: PlayerId
   }
-  gridSize: number,
-  escapePoint: Position,
+  gridSize: number
+  escapePoint: Position
   currentMaze: MAZE
 }
 
 export interface NPC {
-  name: string,
-  pos: Position,
-  redPassedByDirection: string,
-  bluePassedByDirection: string,
-  lastContactedRed: boolean,
-  lastContactedBlue: boolean,
-  dialogue : string,
-  isRedPassed: boolean,
-  isBluePassed: boolean,
-  sayTruth: boolean,
-  sayLie: boolean,
-  sayBluff: boolean // this is bluff or riddle  
+  name: string
+  pos: Position
+  redPassedByDirection: string
+  bluePassedByDirection: string
+  lastContactedRed: boolean
+  lastContactedBlue: boolean
+  dialogue: string
+  isRedPassed: boolean
+  isBluePassed: boolean
+  sayTruth: boolean
+  sayLie: boolean
+  sayBluff: boolean // this is bluff or riddle
 }
 
-export interface MAZE{
-  name: string,
-  possibleEscapePoints: Position[],
-  possibleRedPoints: Position[],
-  possibleBluePoints: Position[],
-  mazeMapArray: number[][],
+export interface MAZE {
+  name: string
+  possibleEscapePoints: Position[]
+  possibleRedPoints: Position[]
+  possibleBluePoints: Position[]
+  mazeMapArray: number[][]
   npcPossibleDirs: string[][]
 }

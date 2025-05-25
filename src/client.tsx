@@ -1,11 +1,11 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import Game from './components/Game'
-import './styles.css'
+import React from "react"
+import ReactDOM from "react-dom/client"
+import Game from "./components/Game"
+import "./styles.css"
 
 Rune.initClient({
   onChange: ({ game, yourPlayerId }) => {
-    const root = document.getElementById('root')
+    const root = document.getElementById("root")
     if (root) {
       ReactDOM.createRoot(root).render(
         <React.StrictMode>
