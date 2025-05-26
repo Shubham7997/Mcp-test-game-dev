@@ -159,18 +159,13 @@ function initBluePoint(index: number): Position {
   ]
 }
 
-const current_maze: number = InitializeMaze()
-const selectedEscape: Position = initEscapePoint(current_maze)
-const selectedRedPoint: Position = initRedPoint(current_maze)
-const selectedBluePoint: Position = initBluePoint(current_maze)
-
 // npc positions
-function generateNPCs(): NPC[] {
+function generateNPCs(index: number): NPC[] {
   const resnpcs: NPC[] = []
 
   for (let i = 0; i < GRID_SIZE + 1; i++) {
     for (let j = 0; j < GRID_SIZE; j++) {
-      if (mazes_configs[current_maze].mazeMapArray[i][j] == 2) {
+      if (mazes_configs[index].mazeMapArray[i][j] == 2) {
         const m = 1 + (Math.floor(Math.random() * 99) % 3)
         const newNpc = {
           name: "unknown",
@@ -195,7 +190,13 @@ function generateNPCs(): NPC[] {
 }
 
 // Generate a simple maze with some random walls
-function generateMaze(size: number): boolean[][] {
+function generateMaze(
+  size: number,
+  index: number,
+  selectedRedPoint: Position,
+  selectedBluePoint: Position,
+  selectedEscape: Position
+): boolean[][] {
   const maze: boolean[][] = Array(size)
     .fill(null)
     .map(() => Array(size).fill(false))
@@ -203,7 +204,7 @@ function generateMaze(size: number): boolean[][] {
   //hardcoded maze1
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      if (mazes_configs[current_maze].mazeMapArray[y][x] == 1) {
+      if (mazes_configs[index].mazeMapArray[y][x] == 1) {
         maze[y][x] = true
       }
     }
@@ -234,9 +235,9 @@ function getRandomDir(dirs: string[], exclude: string): string {
   return res
 }
 
-function getOppositeDir(dir: string, npcId: number): string {
+function getOppositeDir(dir: string, npcId: number, index: number): string {
   return getRandomDir(
-    mazes_configs[current_maze].npcPossibleDirs[npcId],
+    mazes_configs[index].npcPossibleDirs[npcId],
     dir
   ).toUpperCase()
 }
@@ -245,7 +246,8 @@ function getDialogue(
   npc: NPC,
   redPlayer: boolean,
   bluePlayer: boolean,
-  npc_id: number
+  npc_id: number,
+  index: number
 ): string {
   if (redPlayer) {
     if (npc.isBluePassed) {
@@ -257,12 +259,12 @@ function getDialogue(
       } else if (npc.sayLie) {
         return (
           "Yes, BLUE passed from here towards " +
-          getOppositeDir(npc.bluePassedByDirection, npc_id)
+          getOppositeDir(npc.bluePassedByDirection, npc_id, index)
         )
       } else if (npc.sayBluff) {
         return (
           "Can't say, but i think BLUE went either towards " +
-          getOppositeDir(npc.bluePassedByDirection, npc_id) +
+          getOppositeDir(npc.bluePassedByDirection, npc_id, index) +
           " or " +
           npc.bluePassedByDirection.toUpperCase()
         )
@@ -272,12 +274,13 @@ function getDialogue(
         return "No, didn't seen anyone passing or may be missed it"
       } else if (npc.sayLie) {
         return (
-          "Yes, BLUE passed from here towards " + getOppositeDir("", npc_id)
+          "Yes, BLUE passed from here towards " +
+          getOppositeDir("", npc_id, index)
         )
       } else if (npc.sayBluff) {
         return (
           "Can't say, but i think BLUE went towards " +
-          getOppositeDir("", npc_id)
+          getOppositeDir("", npc_id, index)
         )
       }
     }
@@ -291,12 +294,12 @@ function getDialogue(
       } else if (npc.sayLie) {
         return (
           "Yes, RED passed from here towards " +
-          getOppositeDir(npc.redPassedByDirection, npc_id)
+          getOppositeDir(npc.redPassedByDirection, npc_id, index)
         )
       } else if (npc.sayBluff) {
         return (
           "Can't say, but i think RED went either towards " +
-          getOppositeDir(npc.redPassedByDirection, npc_id) +
+          getOppositeDir(npc.redPassedByDirection, npc_id, index) +
           " or " +
           npc.redPassedByDirection.toUpperCase()
         )
@@ -305,11 +308,14 @@ function getDialogue(
       if (npc.sayTruth) {
         return "No, didn't seen anyone passing or may be missed it"
       } else if (npc.sayLie) {
-        return "Yes, RED passed from here towards " + getOppositeDir("", npc_id)
+        return (
+          "Yes, RED passed from here towards " +
+          getOppositeDir("", npc_id, index)
+        )
       } else if (npc.sayBluff) {
         return (
           "Can't say, but i think RED went towards " +
-          getOppositeDir("", npc_id)
+          getOppositeDir("", npc_id, index)
         )
       }
     }
@@ -352,11 +358,21 @@ Rune.initLogic({
   maxPlayers: 2,
   setup: (allPlayerIds): GameState => {
     // Initialize game state
+    const current_maze: number = InitializeMaze()
+    const selectedEscape: Position = initEscapePoint(current_maze)
+    const selectedRedPoint: Position = initRedPoint(current_maze)
+    const selectedBluePoint: Position = initBluePoint(current_maze)
     return {
       redBall: { x: selectedRedPoint.x, y: selectedRedPoint.y },
       blueBall: { x: selectedBluePoint.x, y: selectedBluePoint.y },
-      maze: generateMaze(GRID_SIZE),
-      npcs: generateNPCs(),
+      maze: generateMaze(
+        GRID_SIZE,
+        current_maze,
+        selectedRedPoint,
+        selectedBluePoint,
+        selectedEscape
+      ),
+      npcs: generateNPCs(current_maze),
       lastNpc: -1,
       redIntelInfo: "",
       blueIntelInfo: "",
@@ -367,7 +383,7 @@ Rune.initLogic({
         blue: allPlayerIds[1],
       },
       gridSize: GRID_SIZE,
-      currentMaze: mazes_configs[current_maze],
+      currentMaze: current_maze,
       escapePoint: selectedEscape,
     }
   },
@@ -446,7 +462,13 @@ Rune.initLogic({
             rr =
               npc.name +
               " says '" +
-              getDialogue(npc, isRedPlayer, isBluePlayer, index) +
+              getDialogue(
+                npc,
+                isRedPlayer,
+                isBluePlayer,
+                index,
+                game.currentMaze
+              ) +
               "'"
             game.redIntelInfo = rr
           }
@@ -456,7 +478,13 @@ Rune.initLogic({
             br =
               npc.name +
               " says '" +
-              getDialogue(npc, isRedPlayer, isBluePlayer, index) +
+              getDialogue(
+                npc,
+                isRedPlayer,
+                isBluePlayer,
+                index,
+                game.currentMaze
+              ) +
               "'"
             game.blueIntelInfo = br
           }

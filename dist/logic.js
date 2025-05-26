@@ -129,15 +129,11 @@ function initRedPoint(index) {
 function initBluePoint(index) {
   return mazes_configs[index].possibleBluePoints[Math.floor(Math.random() * mazes_configs[index].possibleBluePoints.length)];
 }
-const current_maze = InitializeMaze();
-const selectedEscape = initEscapePoint(current_maze);
-const selectedRedPoint = initRedPoint(current_maze);
-const selectedBluePoint = initBluePoint(current_maze);
-function generateNPCs() {
+function generateNPCs(index) {
   const resnpcs = [];
   for (let i = 0; i < GRID_SIZE + 1; i++) {
     for (let j = 0; j < GRID_SIZE; j++) {
-      if (mazes_configs[current_maze].mazeMapArray[i][j] == 2) {
+      if (mazes_configs[index].mazeMapArray[i][j] == 2) {
         const m = 1 + Math.floor(Math.random() * 99) % 3;
         const newNpc = {
           name: "unknown",
@@ -160,11 +156,11 @@ function generateNPCs() {
   }
   return resnpcs;
 }
-function generateMaze(size) {
+function generateMaze(size, index, selectedRedPoint, selectedBluePoint, selectedEscape) {
   const maze = Array(size).fill(null).map(() => Array(size).fill(false));
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      if (mazes_configs[current_maze].mazeMapArray[y][x] == 1) {
+      if (mazes_configs[index].mazeMapArray[y][x] == 1) {
         maze[y][x] = true;
       }
     }
@@ -183,29 +179,29 @@ function getRandomDir(dirs, exclude) {
   const res = temp1[Math.floor(Math.random() * temp1.length)];
   return res;
 }
-function getOppositeDir(dir, npcId) {
+function getOppositeDir(dir, npcId, index) {
   return getRandomDir(
-    mazes_configs[current_maze].npcPossibleDirs[npcId],
+    mazes_configs[index].npcPossibleDirs[npcId],
     dir
   ).toUpperCase();
 }
-function getDialogue(npc, redPlayer, bluePlayer, npc_id) {
+function getDialogue(npc, redPlayer, bluePlayer, npc_id, index) {
   if (redPlayer) {
     if (npc.isBluePassed) {
       if (npc.sayTruth) {
         return "Yes, BLUE passed from here towards " + npc.bluePassedByDirection.toUpperCase();
       } else if (npc.sayLie) {
-        return "Yes, BLUE passed from here towards " + getOppositeDir(npc.bluePassedByDirection, npc_id);
+        return "Yes, BLUE passed from here towards " + getOppositeDir(npc.bluePassedByDirection, npc_id, index);
       } else if (npc.sayBluff) {
-        return "Can't say, but i think BLUE went either towards " + getOppositeDir(npc.bluePassedByDirection, npc_id) + " or " + npc.bluePassedByDirection.toUpperCase();
+        return "Can't say, but i think BLUE went either towards " + getOppositeDir(npc.bluePassedByDirection, npc_id, index) + " or " + npc.bluePassedByDirection.toUpperCase();
       }
     } else {
       if (npc.sayTruth) {
         return "No, didn't seen anyone passing or may be missed it";
       } else if (npc.sayLie) {
-        return "Yes, BLUE passed from here towards " + getOppositeDir("", npc_id);
+        return "Yes, BLUE passed from here towards " + getOppositeDir("", npc_id, index);
       } else if (npc.sayBluff) {
-        return "Can't say, but i think BLUE went towards " + getOppositeDir("", npc_id);
+        return "Can't say, but i think BLUE went towards " + getOppositeDir("", npc_id, index);
       }
     }
   } else if (bluePlayer) {
@@ -213,17 +209,17 @@ function getDialogue(npc, redPlayer, bluePlayer, npc_id) {
       if (npc.sayTruth) {
         return "Yes, RED passed from here towards " + npc.redPassedByDirection.toUpperCase();
       } else if (npc.sayLie) {
-        return "Yes, RED passed from here towards " + getOppositeDir(npc.redPassedByDirection, npc_id);
+        return "Yes, RED passed from here towards " + getOppositeDir(npc.redPassedByDirection, npc_id, index);
       } else if (npc.sayBluff) {
-        return "Can't say, but i think RED went either towards " + getOppositeDir(npc.redPassedByDirection, npc_id) + " or " + npc.redPassedByDirection.toUpperCase();
+        return "Can't say, but i think RED went either towards " + getOppositeDir(npc.redPassedByDirection, npc_id, index) + " or " + npc.redPassedByDirection.toUpperCase();
       }
     } else {
       if (npc.sayTruth) {
         return "No, didn't seen anyone passing or may be missed it";
       } else if (npc.sayLie) {
-        return "Yes, RED passed from here towards " + getOppositeDir("", npc_id);
+        return "Yes, RED passed from here towards " + getOppositeDir("", npc_id, index);
       } else if (npc.sayBluff) {
-        return "Can't say, but i think RED went towards " + getOppositeDir("", npc_id);
+        return "Can't say, but i think RED went towards " + getOppositeDir("", npc_id, index);
       }
     }
   }
@@ -257,11 +253,21 @@ Rune.initLogic({
   minPlayers: 2,
   maxPlayers: 2,
   setup: (allPlayerIds) => {
+    const current_maze = InitializeMaze();
+    const selectedEscape = initEscapePoint(current_maze);
+    const selectedRedPoint = initRedPoint(current_maze);
+    const selectedBluePoint = initBluePoint(current_maze);
     return {
       redBall: { x: selectedRedPoint.x, y: selectedRedPoint.y },
       blueBall: { x: selectedBluePoint.x, y: selectedBluePoint.y },
-      maze: generateMaze(GRID_SIZE),
-      npcs: generateNPCs(),
+      maze: generateMaze(
+        GRID_SIZE,
+        current_maze,
+        selectedRedPoint,
+        selectedBluePoint,
+        selectedEscape
+      ),
+      npcs: generateNPCs(current_maze),
       lastNpc: -1,
       redIntelInfo: "",
       blueIntelInfo: "",
@@ -272,7 +278,7 @@ Rune.initLogic({
         blue: allPlayerIds[1]
       },
       gridSize: GRID_SIZE,
-      currentMaze: mazes_configs[current_maze],
+      currentMaze: current_maze,
       escapePoint: selectedEscape
     };
   },
@@ -329,13 +335,25 @@ Rune.initLogic({
           if (isRedPlayer) {
             npc.isRedPassed = true;
             npc.lastContactedRed = true;
-            rr = npc.name + " says '" + getDialogue(npc, isRedPlayer, isBluePlayer, index) + "'";
+            rr = npc.name + " says '" + getDialogue(
+              npc,
+              isRedPlayer,
+              isBluePlayer,
+              index,
+              game.currentMaze
+            ) + "'";
             game.redIntelInfo = rr;
           }
           if (isBluePlayer) {
             npc.isBluePassed = true;
             npc.lastContactedBlue = true;
-            br = npc.name + " says '" + getDialogue(npc, isRedPlayer, isBluePlayer, index) + "'";
+            br = npc.name + " says '" + getDialogue(
+              npc,
+              isRedPlayer,
+              isBluePlayer,
+              index,
+              game.currentMaze
+            ) + "'";
             game.blueIntelInfo = br;
           }
         }
