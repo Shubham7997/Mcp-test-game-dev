@@ -21,7 +21,7 @@ export interface GameState {
   }
   gridSize: number
   escapePoint: Position
-  currentMaze:                  number
+  currentMaze: number
 }
 
 export interface NPC {
